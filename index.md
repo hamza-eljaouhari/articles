@@ -1,3 +1,112 @@
+# A basic HPC
+2 min read · Dec 11, 2023
+
+Creating a High-Performance Computing (HPC) cluster involves several technical steps, including setting up the hardware, installing and configuring the software, and ensuring network connectivity. Here’s a tutorial with command lines, focusing on a Linux-based environment. This tutorial assumes basic knowledge of Linux and networking.
+
+## Step 1: Basic Setup
+- **Install a Linux Distribution**: Choose a server-oriented distribution like CentOS, Ubuntu Server, or Debian.
+    - Example: To install Ubuntu Server, download the ISO from the Ubuntu website and follow the installation instructions.
+- **Update Your System**:
+    ```bash
+    sudo apt update && sudo apt upgrade
+    ```
+
+## Step 2: Install SSH
+SSH (Secure Shell) is essential for remotely managing your cluster nodes.
+- **Install SSH Server**:
+    ```bash
+    sudo apt install openssh-server
+    ```
+- **Start SSH Service**:
+    ```bash
+    sudo systemctl start ssh
+    ```
+- **Enable SSH on Boot**:
+    ```bash
+    sudo systemctl enable ssh
+    ```
+
+## Step 3: Setting Up a Network
+Configure a private network for your cluster nodes. This setup assumes you have a dedicated network interface for the cluster.
+- **Edit Network Configuration**:
+    ```bash
+    sudo nano /etc/network/interfaces
+    ```
+    Add lines similar to the following, replacing `eth1` and IP addresses with your specific details:
+    ```plaintext
+    auto eth1
+    iface eth1 inet static
+        address 192.168.1.1
+        netmask 255.255.255.0
+    ```
+- **Restart Network Service**:
+    ```bash
+    sudo systemctl restart networking
+    ```
+
+## Step 4: Install and Configure NFS
+Network File System (NFS) allows you to share directories among various nodes in the cluster.
+- **Install NFS Server**:
+    ```bash
+    sudo apt install nfs-kernel-server
+    ```
+- **Configure Exports**:
+    ```bash
+    sudo nano /etc/exports
+    ```
+    Add a line like:
+    ```plaintext
+    /home 192.168.1.0/24(rw,sync,no_subtree_check)
+    ```
+- **Export the Shared Directories**:
+    ```bash
+    sudo exportfs -a
+    ```
+- **Start NFS Service**:
+    ```bash
+    sudo systemctl start nfs-kernel-server
+    ```
+
+## Step 5: Setting Up Compute Nodes
+Repeat Steps 1 to 3 for each compute node, ensuring each node has a unique IP address but is on the same subnet.
+
+## Step 6: Install MPI
+MPI (Message Passing Interface) is crucial for parallel computing.
+- **Install MPI**:
+    ```bash
+    sudo apt install mpich
+    ```
+
+## Step 7: Cluster Management and Job Scheduling
+Install and configure a job scheduler like Slurm or TORQUE. Here’s a basic setup for Slurm:
+- **Install Slurm**:
+    ```bash
+    sudo apt install slurm-wlm
+    ```
+- **Configure Slurm**:
+    ```bash
+    sudo nano /etc/slurm-llnl/slurm.conf
+    ```
+    Configure the control and compute nodes according to your cluster’s setup.
+- **Start Slurm Services**:
+    ```bash
+    sudo systemctl start slurmctld
+    sudo systemctl start slurmd
+    ```
+
+## Step 8: Testing the Cluster
+- **Run a Test MPI Job**:
+    Create a simple MPI test program and compile it:
+    ```bash
+    mpicc -o mpi_test mpi_test.c
+    sbatch mpi_test
+    ```
+
+## Conclusion
+This tutorial outlines the fundamental steps for setting up a basic HPC cluster. Each HPC setup will have unique requirements, and further customization might be needed. For more detailed configurations, especially for larger or more specialized clusters, consult the documentation for each software package and consider seeking advice from HPC experts.
+
+Tags: Hpc, Networking, Linux, Tutorial
+
 # Building a Cryptographic Key Management System in .NET Core
 
 In this tutorial, we will walk through the process of building a cryptographic key management system (KMS) using .NET Core. This KMS will support both RSA and AES encryption algorithms and provide various key management functionalities such as creating, activating, deactivating, revoking, and destroying keys.
